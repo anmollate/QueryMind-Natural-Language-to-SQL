@@ -1,0 +1,5 @@
+langchain_huggingface
+python-dotenv
+os
+psycopg2
+urllib
