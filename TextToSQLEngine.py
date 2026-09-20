@@ -11,7 +11,7 @@ HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 
 
-def get_sqlquery(query):
+def get_sqlquery(query,schema):
     llm = HuggingFaceEndpoint(
         repo_id="XGenerationLab/XiYanSQL-QwenCoder-7B-2504",
         task="text-generation",
@@ -26,7 +26,7 @@ def get_sqlquery(query):
     You are an expert SQL developer. Convert the user's natural language question into a single, correct SQL query based only on the database schema provided below.
 
     ### Database Schema
-    {extract_schema()}
+    {schema}
 
     ### Rules
     1. Only use tables and columns that exist in the schema above. Never invent column or table names.
@@ -71,7 +71,8 @@ def get_results(sql_query):
 
 if __name__ == "__main__":
     user_query = input("Enter your query (user query):")
-    sql_query=get_sqlquery(user_query)
+    schema = extract_schema()
+    sql_query=get_sqlquery(user_query,schema)
     results=get_results(sql_query)
     print(sql_query)
     print(results)
