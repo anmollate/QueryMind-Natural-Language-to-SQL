@@ -102,6 +102,10 @@ def pipeline():
     sql_query=get_sqlquery(user_query, schema)
     results=get_results(sql_query)
     judgement=get_judgement(user_query, schema, sql_query, results)
+    print("User Query:", user_query)
+    print("Database Schema:", schema)
+    print("Generated SQL Query:", sql_query)
+    print("SQL Query Results:", results)
     print("Judgement:", judgement)
 
 if __name__ == "__main__":
