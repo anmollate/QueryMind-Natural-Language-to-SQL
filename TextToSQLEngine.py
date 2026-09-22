@@ -4,6 +4,7 @@ from urllib.parse import quote_plus
 from dotenv import load_dotenv
 import psycopg2
 import os
+import json
 
 load_dotenv()
 
@@ -12,45 +13,102 @@ HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 
 def get_sqlquery(query,schema):
-    llm = HuggingFaceEndpoint(
-        repo_id="XGenerationLab/XiYanSQL-QwenCoder-7B-2504",
+    llm1 = HuggingFaceEndpoint(
+        repo_id="XGenerationLab/XiYanSQL-QwenCoder-32B-2504",
         task="text-generation",
-        provider="featherless-ai",
         huggingfacehub_api_token=HUGGINGFACE_API_KEY,
-        temperature=0.1,   # low temp — you want deterministic SQL, not creative variation
+        temperature=0.1   # low temp — you want deterministic SQL, not creative variation
     )
 
-    model = ChatHuggingFace(llm=llm)
+    llm2 = HuggingFaceEndpoint(
+        repo_id="Qwen2.5-Coder-32B-Instruct",
+        task="text-generation",
+        huggingfacehub_api_token=HUGGINGFACE_API_KEY,
+        temperature=0.1
+    )
+
+    model1 = ChatHuggingFace(llm=llm1)
+    model2 = ChatHuggingFace(llm=llm2)
 
     prompt1 = f"""
-    You are an expert SQL developer. Convert the user's natural language question into a single, correct SQL query based only on the database schema provided below.
+    You are an expert SQL developer specializing in PostgreSQL.
 
-    ### Database Schema
+    Your task is to convert the user's natural language question into a single,
+    correct SQL query using ONLY the database schema provided below.
+
+    ### DATABASE SCHEMA
     {schema}
 
-    ### Rules
-    1. Only use tables and columns that exist in the schema above. Never invent column or table names.
-    2. Use explicit JOINs (not comma joins), and qualify column names with table names/aliases when more than one table is involved.
-    3. Use the exact SQL dialect: PostgreSQL.
-    4. If the question is ambiguous or cannot be answered from the schema, respond with: -- CANNOT_ANSWER: <short reason>
-    5. Do not include explanations, comments, or markdown formatting — output only the raw SQL query.
-    6. Prefer readable formatting: one clause per line (SELECT, FROM, WHERE, GROUP BY, ORDER BY).
-    7. Use LIMIT only if the user asks for "top N" / "first N" results.
-
-    ### User Question
+    ### USER QUESTION
     {query}
 
-    ### SQL Query
+    ### INSTRUCTIONS
+
+    1. Generate exactly one SQL query that answers the user's question.
+
+    2. Use ONLY the tables and columns present in the provided database schema.
+    Never invent, assume, or create table or column names.
+
+    3. Use PostgreSQL syntax and SQL conventions.
+
+    4. When multiple tables are required:
+    - Use explicit JOIN statements.
+    - Do not use comma-separated joins.
+    - Use table names or aliases to qualify columns where necessary.
+
+    5. Use appropriate SQL clauses such as:
+    SELECT, FROM, JOIN, WHERE, GROUP BY, HAVING, ORDER BY, and LIMIT
+    according to the user's question.
+
+    6. Use LIMIT only when the user explicitly asks for a limited number of
+    results, such as "top 5", "first 10", or "latest 20".
+
+    7. If the question cannot be answered using the provided schema, do not
+    generate a SQL query. Instead, set the "query" field to:
+    "-- CANNOT_ANSWER"
+    and explain the reason in the "reasoning" field.
+
+    8. If the question is ambiguous, identify the ambiguity in the "reasoning"
+    field and set the "query" field to:
+    "-- CANNOT_ANSWER"
+
+    9. The reasoning should briefly explain:
+    - Which tables and columns were selected.
+    - How they relate to the user's question.
+    - Any JOIN, filtering, grouping, or ordering logic used.
+    Do not provide unnecessary or unrelated information.
+
+    10. Return the response ONLY as valid JSON.
+
+    11. Do not use Markdown code fences.
+
+    12. Do not add any text before or after the JSON object.
+
+    ### REQUIRED OUTPUT FORMAT
+
+    {{
+        "query": "<generated PostgreSQL SQL query>",
+        "reasoning": "<brief explanation of how the query was constructed>"
+    }}
     """
 
     try:
-        result1 = model.invoke(prompt1)
+        result1 = model1.invoke(prompt1)
         sql_query = result1.content
         print("SQL Generation Successful ✅")
         return sql_query
     except Exception as e:
-        print(f"Inference call failed: {e}")
-        sql_query = None
+        print(f"Model 1 inference failed {e}, trying Model 2...")
+
+    try:
+        result1 = model2.invoke(prompt1)
+        sql_query = result1.content
+        print("SQL Generation Successful ✅")
+        return sql_query
+    except Exception as e:
+        print("Model 2 inference failed")
+        result1=None
+
 
 def get_results(sql_query):
     password = os.getenv("database_password")
@@ -68,14 +126,43 @@ def get_results(sql_query):
     print("Query executed successfully ✅")
     return results
 
+def TTSQL_pipeline():
+    user_query = input("Enter your query (user query):")
+    try:
+        schema = extract_schema()
+    except Exception as e:
+        print(f"Schema extraction failed: {e}")
+        schema = None
+
+    try:
+        sql_query=get_sqlquery(user_query,schema)
+        sql_query_dict=json.loads(sql_query) 
+        print("Generated SQL Query:", sql_query_dict['query'])
+        print("Reasoning:", sql_query_dict['reasoning'])
+    except Exception as e:
+        print(f"SQL generation failed: {e}")
+        sql_query = None
+    
+    try:
+        results=get_results(sql_query_dict['query'])
+        print(results)
+    except Exception as e:
+         return f"Failed to execute query: {e}"
+         results = None
+
+    return {
+        "user_query": user_query,
+        "database_schema": schema,
+        "generated_sql_query": sql_query_dict['query'],
+        "reasoning": sql_query_dict['reasoning'],
+        "results": results
+    }
+
+
 
 if __name__ == "__main__":
-    user_query = input("Enter your query (user query):")
-    schema = extract_schema()
-    sql_query=get_sqlquery(user_query,schema)
-    results=get_results(sql_query)
-    print(sql_query)
-    print(results)
+    TTSQL_pipeline()
+
 
 
 
