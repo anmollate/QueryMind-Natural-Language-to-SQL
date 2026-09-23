@@ -9,7 +9,7 @@ import os
 load_dotenv()
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
-def get_judgement(user_query,schema,sql_query,results):
+def get_llm_judgement(user_query,schema,sql_query,results):
     llm = HuggingFaceEndpoint(
         repo_id="Qwen/Qwen3-32B",
         task="text-generation",
@@ -97,42 +97,43 @@ def get_judgement(user_query,schema,sql_query,results):
     """
 
     judgement=model.invoke(judge_prompt)
-    return judgement.content
+    return json.loads(judgement.content)
 
-def judgement_pipeline(): #needs work
-    # user_query=input("Enter your query: ")
-    # schema=extract_schema()
-    # sql_query=get_sqlquery(user_query, schema)
-    # results=get_results(sql_query)
-    # judgement=get_judgement(user_query, schema, sql_query, results)
-    # print("User Query:", user_query)
-    # print("Database Schema:", schema)
-    # print("Generated SQL Query:", sql_query)
-    # print("SQL Query Results:", results)
-    # print("Judgement:", judgement)
-    # return {
-    #     "User Query": user_query,
-    #     "Database Schema": schema,
-    #     "Generated SQL Query": sql_query,
-    #     "SQL Query Results": results,
-    #     "Judgement": judgement
-    # }
-    data = TTSQL_pipeline() #this would cause break it has been updated get parameter
-    user_query = data['user_query']
-    schema = data['database_schema']
-    sql_query = data['generated_sql_query']
-    results = data['results']
-    judgement = get_judgement(user_query, schema, sql_query, results)
-    print("User Query:", user_query)
-    # print("Database Schema:", schema)
-    print("Generated SQL Query:", sql_query)
-    print("SQL Query Results:", results)
-    print("Judgement:", judgement)
+# def judgement_pipeline(): #needs work
+#     # user_query=input("Enter your query: ")
+#     # schema=extract_schema()
+#     # sql_query=get_sqlquery(user_query, schema)
+#     # results=get_results(sql_query)
+#     # judgement=get_judgement(user_query, schema, sql_query, results)
+#     # print("User Query:", user_query)
+#     # print("Database Schema:", schema)
+#     # print("Generated SQL Query:", sql_query)
+#     # print("SQL Query Results:", results)
+#     # print("Judgement:", judgement)
+#     # return {
+#     #     "User Query": user_query,
+#     #     "Database Schema": schema,
+#     #     "Generated SQL Query": sql_query,
+#     #     "SQL Query Results": results,
+#     #     "Judgement": judgement
+#     # }
+#     data = TTSQL_pipeline() #this would cause break it has been updated get parameter
+#     user_query = data['user_query']
+#     schema = data['database_schema']
+#     sql_query = data['generated_sql_query']
+#     results = data['results']
+#     judgement = get_judgement(user_query, schema, sql_query, results)
+#     print("User Query:", user_query)
+#     # print("Database Schema:", schema)
+#     print("Generated SQL Query:", sql_query)
+#     print("SQL Query Results:", results)
+#     print("Judgement:", judgement)
 
 
 
 if __name__ == "__main__":
-    pipeline()
+    print("hello")
+    # judgement_pipeline()
 
 
 

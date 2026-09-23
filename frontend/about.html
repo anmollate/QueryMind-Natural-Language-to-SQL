@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QueryMind — Architecture &amp; Models</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="about.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><span class="mark">Q</span>QueryMind</a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="studio.html">Product</a>
+      <a href="about.html" class="active">About</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="studio.html" class="btn btn-primary">Try Live Demo</a>
+      <a href="https://github.com" class="btn-icon" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<header class="about-head">
+  <div class="wrap">
+    <h1>QueryMind architecture &amp; models</h1>
+    <p>Interactive, technical documentation of how a question becomes a query.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="bento">
+
+    <!-- System flow -->
+    <div class="card panel full">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+        <div>
+          <h3>System flow</h3>
+          <div class="card-sub">Generation is checked by a judge model before anything reaches the user</div>
+        </div>
+      </div>
+
+      <div class="flow-diagram-wrap">
+        <svg class="flow-svg" viewBox="0 0 720 690" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System flow: user prompt goes to the schema extraction module, then the query generation module, then evaluation, then an LLM judge which either shows results or sends the query back for regeneration.">
+          <defs>
+            <marker id="arrMain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--text-faint)"/>
+            </marker>
+            <marker id="arrYes" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--green)"/>
+            </marker>
+            <marker id="arrNo" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--accent-2)"/>
+            </marker>
+          </defs>
+
+          <!-- connectors -->
+          <line x1="360" y1="62" x2="360" y2="94" class="fd-line" marker-end="url(#arrMain)"/>
+          <line x1="360" y1="160" x2="360" y2="192" class="fd-line" marker-end="url(#arrMain)"/>
+          <line x1="360" y1="258" x2="360" y2="290" class="fd-line" marker-end="url(#arrMain)"/>
+          <line x1="360" y1="356" x2="360" y2="388" class="fd-line" marker-end="url(#arrMain)"/>
+          <line x1="360" y1="454" x2="360" y2="486" class="fd-line" marker-end="url(#arrMain)"/>
+          <line x1="360" y1="578" x2="360" y2="608" class="fd-line fd-yes" marker-end="url(#arrYes)"/>
+          <path d="M470,533 C 592,533 592,226 472,226" class="fd-line fd-no" marker-end="url(#arrNo)" fill="none"/>
+
+          <!-- edge labels -->
+          <text x="374" y="180" class="fd-edge-label">schema + user query</text>
+          <text x="374" y="278" class="fd-edge-label">generated SQL</text>
+          <text x="374" y="376" class="fd-edge-label">answer + query + SQL + schema</text>
+          <text x="378" y="598" class="fd-edge-label fd-yes-label">Yes</text>
+          <text x="596" y="380" class="fd-edge-label fd-no-label" text-anchor="middle" transform="rotate(-90 596 380)">not satisfactory — regenerate</text>
+
+          <!-- nodes -->
+          <g class="fd-node">
+            <rect x="250" y="16" width="220" height="46" rx="9"/>
+            <text x="360" y="44" class="fd-title" text-anchor="middle">User prompt</text>
+          </g>
+
+          <g class="fd-node">
+            <rect x="250" y="96" width="220" height="64" rx="9"/>
+            <text x="360" y="124" class="fd-title" text-anchor="middle">Schema extraction module</text>
+            <text x="360" y="144" class="fd-sub" text-anchor="middle">extracts the full DB schema</text>
+          </g>
+
+          <g class="fd-node fd-node-accent">
+            <rect x="250" y="194" width="220" height="64" rx="9"/>
+            <text x="360" y="222" class="fd-title" text-anchor="middle">Query generation module</text>
+            <text x="360" y="242" class="fd-sub" text-anchor="middle">XiYanSQL-QwenCoder-7B-2504</text>
+          </g>
+
+          <g class="fd-node">
+            <rect x="250" y="292" width="220" height="64" rx="9"/>
+            <text x="360" y="320" class="fd-title" text-anchor="middle">Query evaluation</text>
+            <text x="360" y="340" class="fd-sub" text-anchor="middle">generated SQL is executed</text>
+          </g>
+
+          <g class="fd-node fd-node-accent">
+            <rect x="250" y="390" width="220" height="64" rx="9"/>
+            <text x="360" y="418" class="fd-title" text-anchor="middle">LLM-as-a-judge</text>
+            <text x="360" y="438" class="fd-sub" text-anchor="middle">Qwen3-32B</text>
+          </g>
+
+          <g class="fd-node fd-decision">
+            <polygon points="360,488 470,533 360,578 250,533"/>
+            <text x="360" y="538" class="fd-title" text-anchor="middle">Satisfactory?</text>
+          </g>
+
+          <g class="fd-node fd-node-end">
+            <rect x="250" y="608" width="220" height="46" rx="9"/>
+            <text x="360" y="636" class="fd-title" text-anchor="middle">Results shown to user</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- LLM model usage -->
+    <div class="card panel">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
+        <div>
+          <h3>Models in the pipeline</h3>
+          <div class="card-sub">Two models, two distinct jobs</div>
+        </div>
+      </div>
+      <div class="usage-list">
+        <div class="usage-item">
+          <span class="u-name">XiYanSQL-QwenCoder<br/>-7B-2504</span>
+          <div class="usage-bar-track"><div class="usage-bar-fill" style="width:22%"></div></div>
+          <span class="u-pct">7B</span>
+        </div>
+        <div class="usage-item">
+          <span class="u-name">Qwen3-32B</span>
+          <div class="usage-bar-track"><div class="usage-bar-fill" style="width:100%"></div></div>
+          <span class="u-pct">32B</span>
+        </div>
+      </div>
+      <div class="usage-caption">
+        <span><b>XiYanSQL-QwenCoder-7B-2504</b> — generates SQL from the schema and question.</span>
+        <span><b>Qwen3-32B</b> — judges the generated SQL and result before it reaches the user.</span>
+      </div>
+    </div>
+
+    <!-- Schema linking strategy -->
+    <div class="card panel">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="7" height="7" rx="1.5"/><rect x="14" y="4" width="7" height="7" rx="1.5"/><rect x="3" y="15" width="7" height="7" rx="1.5"/><path d="M10 7.5h4M6.5 11v4"/></svg></div>
+        <div>
+          <h3>Schema linking strategy</h3>
+          <div class="card-sub">No retrieval step — the full schema goes in</div>
+        </div>
+      </div>
+      <div class="strategy-steps">
+        <div class="strategy-step">
+          <span class="s-dot"></span>
+          <div><b>Schema extraction</b><span>The complete database schema — every table, column, and type — is introspected directly from the database at query time.</span></div>
+        </div>
+        <div class="strategy-step">
+          <span class="s-dot"></span>
+          <div><b>Full-schema prompting</b><span>The extracted schema is passed alongside the user's question to the generation model — no shortlisting or retrieval step.</span></div>
+        </div>
+        <div class="strategy-step">
+          <span class="s-dot"></span>
+          <div><b>Judge-validated output</b><span>The generated SQL, its result, the question, and the schema all go to a second model that checks the answer before it's shown.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Performance metrics -->
+    <div class="card panel">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9M12 19V5M20 19v-7"/></svg></div>
+        <div>
+          <h3>Performance metrics</h3>
+          <div class="card-sub">Accuracy and latency, evaluation set</div>
+        </div>
+      </div>
+      <div class="metrics-grid">
+        <div class="metric-block">
+          <div class="m-top"><span class="m-name">Execution accuracy</span><span class="m-val">91%</span></div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" data-value="91"></div></div>
+        </div>
+        <div class="metric-block">
+          <div class="m-top"><span class="m-name">Exact-match accuracy</span><span class="m-val">78%</span></div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" data-value="78"></div></div>
+        </div>
+        <div class="metric-block">
+          <div class="m-top"><span class="m-name">Avg. latency (p50)</span><span class="m-val">1.4s</span></div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" data-value="65"></div></div>
+        </div>
+        <div class="metric-block">
+          <div class="m-top"><span class="m-name">Schema recall</span><span class="m-val">96%</span></div>
+          <div class="metric-bar-track"><div class="metric-bar-fill" data-value="96"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Database security -->
+    <div class="card panel">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/></svg></div>
+        <div>
+          <h3>Database security</h3>
+          <div class="card-sub">Guardrails on every generated query</div>
+        </div>
+      </div>
+      <div class="security-list">
+        <div class="security-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Read-only execution role — no writes or schema changes</div>
+        <div class="security-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Query safety filters block destructive statements</div>
+        <div class="security-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Row-level access control scoped per user</div>
+        <div class="security-item"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>Full query audit log retained</div>
+      </div>
+    </div>
+
+    <!-- Team member -->
+    <div class="card panel full">
+      <div class="card-head">
+        <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c1.2-4 4.2-6 7-6s5.8 2 7 6"/></svg></div>
+        <div>
+          <h3>Team</h3>
+          <div class="card-sub">Who built this</div>
+        </div>
+      </div>
+      <div class="team-row">
+        <div class="avatar">A</div>
+        <div class="team-info">
+          <div class="t-name">Anmol</div>
+          <div class="t-role">Sole contributor — data, model integration, and this interface</div>
+          <div class="t-bio">Fourth-year AI &amp; Data Science engineering student. Built QueryMind end to end: schema linking, prompt design, and the Studio interface shown here.</div>
+        </div>
+        <a href="https://github.com" class="team-link">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span class="footer-note">© 2026 QueryMind. Built as a student project.</span>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="studio.html">Product</a>
+      <a href="https://github.com">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

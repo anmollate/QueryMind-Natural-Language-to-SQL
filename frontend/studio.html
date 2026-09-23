@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QueryMind Studio</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><span class="mark">Q</span>QueryMind <span style="color:var(--text-faint); font-weight:400; font-size:13px; margin-left:2px;">Studio</span></a>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="studio.html" class="active">Product</a>
+      <a href="about.html">About</a>
+      <a href="index.html#contact">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="https://github.com" class="btn-icon" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <div class="studio-head">
+    <h1>Enter your question</h1>
+    <p>Ask about your data in plain English — QueryMind handles the SQL.</p>
+  </div>
+
+  <div class="ask-panel panel">
+    <span class="label">Question</span>
+    <div class="ask-row">
+      <label class="ask-input" for="question-input">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="question-input" type="text" placeholder="What is the total transaction amount per card network this month?" />
+      </label>
+      <button class="btn btn-primary" id="ask-btn">Generate SQL</button>
+    </div>
+
+    <div class="prompts-label">Suggested prompts</div>
+    <div class="prompt-chips" id="prompt-chips">
+      <button class="chip active" data-prompt="cardnetwork">What is the total transaction amount per card network this month?</button>
+      <button class="chip" data-prompt="upicustomers">Which 5 customers have the highest UPI transaction volume?</button>
+      <button class="chip" data-prompt="faileddebit">Which merchants have the most failed debit card transactions?</button>
+    </div>
+  </div>
+
+  <div class="workspace">
+
+    <!-- schema sidebar -->
+    <aside class="schema-panel panel">
+      <h4>Database schema</h4>
+      <div class="tree">
+
+        <div class="tree-table" data-table="credit_card_transactions">
+          <div class="t-row">
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+            credit_card_transactions
+          </div>
+          <div class="tree-cols">
+            <div class="pk">credit_transaction_id · pk</div>
+            <div>customer_id · fk</div>
+            <div>transaction_date · timestamp</div>
+            <div>amount · numeric</div>
+            <div>merchant_name · varchar</div>
+            <div>card_network · varchar</div>
+            <div>card_type · varchar</div>
+            <div>transaction_status · varchar</div>
+            <div>credit_limit · numeric</div>
+          </div>
+        </div>
+
+        <div class="tree-table" data-table="customers">
+          <div class="t-row">
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+            customers
+          </div>
+          <div class="tree-cols">
+            <div class="pk">customer_id · pk</div>
+            <div>full_name · varchar</div>
+            <div>email · varchar</div>
+            <div>phone · varchar</div>
+            <div>city · varchar</div>
+            <div>state · varchar</div>
+            <div>registration_date · date</div>
+          </div>
+        </div>
+
+        <div class="tree-table" data-table="debit_card_transactions">
+          <div class="t-row">
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+            debit_card_transactions
+          </div>
+          <div class="tree-cols">
+            <div class="pk">debit_transaction_id · pk</div>
+            <div>customer_id · fk</div>
+            <div>transaction_date · timestamp</div>
+            <div>amount · numeric</div>
+            <div>merchant_name · varchar</div>
+            <div>card_network · varchar</div>
+            <div>account_type · varchar</div>
+            <div>transaction_status · varchar</div>
+            <div>transaction_type · varchar</div>
+          </div>
+        </div>
+
+        <div class="tree-table" data-table="upi_transactions">
+          <div class="t-row">
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg>
+            upi_transactions
+          </div>
+          <div class="tree-cols">
+            <div class="pk">upi_transaction_id · pk</div>
+            <div>customer_id · fk</div>
+            <div>transaction_date · timestamp</div>
+            <div>amount · numeric</div>
+            <div>merchant_name · varchar</div>
+            <div>upi_app · varchar</div>
+            <div>transaction_status · varchar</div>
+            <div>transaction_type · varchar</div>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- main column -->
+    <section class="main-col">
+
+      <div class="sql-panel panel">
+        <div class="panel-head">
+          <h4>Generated SQL <span class="tag" id="dialect-tag">PostgreSQL</span></h4>
+          <div class="panel-head-actions">
+            <button class="icon-btn" id="copy-btn" aria-label="Copy SQL">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="sql-body">
+          <pre id="sql-output"></pre>
+        </div>
+        <div class="action-row">
+          <button class="btn btn-primary" id="run-btn">Run Query</button>
+          <button class="btn btn-ghost" id="explain-btn">Explain Logic</button>
+        </div>
+        <div class="explain-box" id="explain-box"></div>
+      </div>
+
+      <div class="results-panel panel">
+        <div class="panel-head">
+          <h4>Results</h4>
+        </div>
+        <div class="results-body" id="results-body">
+          <div class="empty-state">Run the query to see results here.</div>
+        </div>
+      </div>
+
+      <div class="analysis-panel panel">
+        <div class="panel-head">
+          <h4>Detailed Analysis</h4>
+        </div>
+        <div class="analysis-body" id="analysis-body">
+          <div class="empty-state">Run the query to see its correctness analysis here.</div>
+        </div>
+      </div>
+
+    </section>
+  </div>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap">
+    <span class="footer-note">© 2026 QueryMind. Built as a student project.</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="index.html">Home</a>
+      <a href="https://github.com">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

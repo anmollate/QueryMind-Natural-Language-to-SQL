@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QueryMind — Natural Language to SQL, Instantly</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="landing.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <a href="index.html" class="brand"><span class="mark">Q</span>QueryMind</a>
+    <div class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="studio.html">Product</a>
+      <a href="about.html">About</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="nav-actions">
+      <a href="studio.html" class="btn btn-primary">Try Live Demo</a>
+      <a href="https://github.com" class="btn-icon" aria-label="GitHub">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">Powered by LLMs</span>
+    <h1>Natural language to <span class="accent">SQL</span>, instantly</h1>
+    <p class="sub">Ask a question in plain English. QueryMind reads your schema, writes the query, and hands back the answer — no SQL required.</p>
+    <div class="cta-row">
+      <a href="studio.html" class="btn btn-primary btn-lg">Try Live Demo</a>
+      <a href="about.html" class="btn btn-ghost btn-lg">Read Technical Docs</a>
+    </div>
+
+    <div class="demo-strip panel">
+      <div class="demo-card question">
+        <span class="label">You ask</span>
+        <p class="q-text">"What is the total transaction amount per card network this month?"</p>
+      </div>
+      <div class="arrow-col">
+        <div class="pulse-dot"></div>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+      </div>
+      <div class="demo-card sql">
+        <span class="label">QueryMind writes</span>
+        <pre><span class="kw">SELECT</span> card_network,
+       <span class="kw">SUM</span>(amount) <span class="kw">AS</span> total
+<span class="kw">FROM</span> credit_card_transactions
+<span class="kw">WHERE</span> transaction_date <span class="kw">&gt;=</span> date_trunc(<span class="str">'month'</span>, CURRENT_DATE)
+<span class="kw">GROUP BY</span> card_network;</pre>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Key features</h2>
+      <p>Everything it takes to go from a plain-English question to a trustworthy answer.</p>
+    </div>
+    <div class="features-grid">
+      <article class="feature">
+        <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6h16M4 12h10M4 18h16"/></svg></div>
+        <h3>Schema awareness</h3>
+        <p>Reads your actual table and column structure, so generated queries stay accurate as your schema evolves.</p>
+      </article>
+      <article class="feature">
+        <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M4 10h16"/></svg></div>
+        <h3>Multiple SQL dialects</h3>
+        <p>Generates dialect-correct queries for PostgreSQL, MySQL, and SQL Server without changing how you ask.</p>
+      </article>
+      <article class="feature">
+        <div class="ic"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg></div>
+        <h3>Explainable AI</h3>
+        <p>Every query ships with a plain-language breakdown of its logic, so you can verify the answer before you trust it.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="stack">
+  <div class="wrap">
+    <div class="section-head" style="margin-bottom:24px;">
+      <h2>Built with</h2>
+    </div>
+    <div class="stack-row">
+      <span class="stack-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3c-4 0-4 3-4 3v3h4"/><path d="M12 21c4 0 4-3 4-3v-3h-4"/><circle cx="9" cy="6" r=".6" fill="currentColor"/><circle cx="15" cy="18" r=".6" fill="currentColor"/></svg>Python</span>
+      <span class="stack-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 12h14M5 12l4-4M5 12l4 4M19 12l-4-4M19 12l-4 4"/></svg>LangChain</span>
+      <span class="stack-chip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="9"/></svg>OpenAI</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="wrap">
+    <div class="cta-band">
+      <h2>Get started</h2>
+      <p>Get started with the live demo, or read the docs for setup and architecture.</p>
+      <div class="cta-row">
+        <a href="studio.html" class="btn btn-primary btn-lg">Try Live Demo →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <span class="footer-note">© 2026 QueryMind. Built as a student project.</span>
+    <div class="footer-links">
+      <a href="about.html">About</a>
+      <a href="studio.html">Product</a>
+      <a href="https://github.com">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

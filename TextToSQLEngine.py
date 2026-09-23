@@ -126,8 +126,7 @@ def get_results(sql_query):
     print("Query executed successfully ✅")
     return results
 
-def TTSQL_pipeline():
-    user_query = input("Enter your query (user query):")
+def TTSQL_pipeline(user_query):
     try:
         schema = extract_schema()
     except Exception as e:
@@ -135,27 +134,42 @@ def TTSQL_pipeline():
         schema = None
 
     try:
-        sql_query=get_sqlquery(user_query,schema)
-        sql_query_dict=json.loads(sql_query) 
+        sql_query = get_sqlquery(user_query, schema)
+        sql_query_dict = json.loads(sql_query)
         print("Generated SQL Query:", sql_query_dict['query'])
         print("Reasoning:", sql_query_dict['reasoning'])
     except Exception as e:
         print(f"SQL generation failed: {e}")
-        sql_query = None
-    
+        return {
+            "user_query": user_query,
+            "database_schema": schema,
+            "generated_sql_query": None,
+            "reasoning": None,
+            "results": None,
+            "error": f"SQL generation failed: {e}",
+        }
+
     try:
-        results=get_results(sql_query_dict['query'])
+        results = get_results(sql_query_dict['query'])
         print(results)
     except Exception as e:
-         return f"Failed to execute query: {e}"
-         results = None
+        print(f"Query execution failed: {e}")
+        return {
+            "user_query": user_query,
+            "database_schema": schema,
+            "generated_sql_query": sql_query_dict['query'],
+            "reasoning": sql_query_dict['reasoning'],
+            "results": None,
+            "error": f"Failed to execute query: {e}",
+        }
 
     return {
         "user_query": user_query,
         "database_schema": schema,
         "generated_sql_query": sql_query_dict['query'],
         "reasoning": sql_query_dict['reasoning'],
-        "results": results
+        "results": results,
+        "error": None,
     }
 
 
