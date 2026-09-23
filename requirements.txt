@@ -1,5 +1,6 @@
-langchain_huggingface
+fastapi
+uvicorn
+pydantic
 python-dotenv
-os
-psycopg2
-urllib
+psycopg2-binary
+langchain-huggingface
