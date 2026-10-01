@@ -30,7 +30,7 @@
   "use strict";
 
   // Point this at wherever uvicorn is serving the FastAPI app.
-  const API_BASE = "http://localhost:8000";
+  const API_BASE = "https://query-mind-natural-language-to-sql.vercel.app";
 
   // Judge scores are assumed to be 0-1 floats. If your judge LLM
   // returns a different scale (e.g. 1-5), adjust this threshold.
