@@ -9,12 +9,34 @@ import os
 load_dotenv()
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
+def parse_judgement(raw_text):
+    if raw_text is None or raw_text.strip() == "":
+        raise ValueError("Judge returned an empty response (likely hit the token limit).")
+
+    text = raw_text
+
+    # Drop the reasoning block if the model included one
+    think_end = text.find("</think>")
+    if think_end != -1:
+        text = text[think_end + len("</think>"):]
+
+    # Keep only the part from the first { to the last }
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        raise ValueError("No JSON object found in judge response: " + repr(raw_text[:200]))
+
+    json_text = text[start:end + 1]
+    return json.loads(json_text)
+
+
 def get_llm_judgement(user_query,schema,sql_query,results):
     llm = HuggingFaceEndpoint(
-        repo_id="Qwen/Qwen3-32B",
+        repo_id="deepseek-ai/DeepSeek-V4-Pro-0813",
         task="text-generation",
         huggingfacehub_api_token=HUGGINGFACE_API_KEY,
-        temperature=0.1   # low temp — you want deterministic SQL, not creative variation
+        temperature=0.1,      # low temp — the judge should give consistent scores
+        max_new_tokens=4096   # default is 512, which a reasoning model can use up on thinking alone
         )
 
     model = ChatHuggingFace(llm=llm)
@@ -94,10 +116,27 @@ def get_llm_judgement(user_query,schema,sql_query,results):
     - Do not invent missing information.
     - Base your evaluation strictly on the USER QUERY, DATABASE SCHEMA,
     and GENERATED SQL.
+    -Return ONLY valid JSON.
+    -Do not use markdown code blocks.
+    -Do not use single quotes.
+    -Use double quotes for all keys and string values.
     """
 
-    judgement=model.invoke(judge_prompt)
-    return json.loads(judgement.content)
+    last_error = None
+
+    for attempt in range(2):
+        judgement = model.invoke(judge_prompt)
+        print("JUDGE RAW RESPONSE:")
+        print(repr(judgement.content))
+        print("RESPONSE METADATA:")
+        print(judgement.response_metadata)
+        try:
+            return parse_judgement(judgement.content)
+        except ValueError as error:   # JSONDecodeError is a subclass of ValueError
+            last_error = error
+            print("Judge attempt", attempt + 1, "failed:", error)
+
+    raise RuntimeError("Judge failed after 2 attempts: " + str(last_error))
 
 # def judgement_pipeline(): #needs work
 #     # user_query=input("Enter your query: ")
@@ -132,8 +171,54 @@ def get_llm_judgement(user_query,schema,sql_query,results):
 
 
 if __name__ == "__main__":
-    print("hello")
-    # judgement_pipeline()
+    schema="""
+    Table: credit_card_transactions
+    Columns:
+    - credit_transaction_id: bigint
+    - customer_id: bigint
+    - transaction_date: timestamp without time zone
+    - amount: numeric
+    - merchant_name: character varying
+    - card_network: character varying
+    - card_type: character varying
+    - transaction_status: character varying
+    - credit_limit: numeric
+
+    Table: customers
+    Columns:
+    - customer_id: bigint
+    - full_name: character varying
+    - email: character varying
+    - phone: character varying
+    - city: character varying
+    - state: character varying
+    - registration_date: date
+
+    Table: debit_card_transactions
+    Columns:
+    - debit_transaction_id: bigint
+    - customer_id: bigint
+    - transaction_date: timestamp without time zone
+    - amount: numeric
+    - merchant_name: character varying
+    - card_network: character varying
+    - account_type: character varying
+    - transaction_status: character varying
+    - transaction_type: character varying
+
+    Table: upi_transactions
+    Columns:
+    - upi_transaction_id: bigint
+    - customer_id: bigint
+    - transaction_date: timestamp without time zone
+    - amount: numeric
+    - merchant_name: character varying
+    - upi_app: character varying
+    - transaction_status: character varying
+    - transaction_type: character varying
+
+"""
+    result1=get_llm_judgement("select the total number of customers",schema,"select count(*) from customers;",100)
 
 
 

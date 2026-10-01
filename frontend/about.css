@@ -46,6 +46,10 @@
   fill:var(--bg-raised);
   stroke:var(--accent-2);
 }
+.fd-node-warn rect{
+  fill:var(--bg-raised);
+  stroke:var(--accent-2);
+}
 .fd-title{
   font-family:var(--f-display); font-size:13px; font-weight:600; fill:var(--text);
 }

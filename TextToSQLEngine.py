@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import psycopg2
 import os
 import json
+import ast
 
 load_dotenv()
 
@@ -12,19 +13,60 @@ HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")
 
 
 
+def parse_sql_response(raw_text):
+    if raw_text is None or raw_text.strip() == "":
+        raise ValueError("Model returned an empty response (or both models failed).")
+
+    text = raw_text
+
+    # Drop the reasoning block if the model included one
+    think_end = text.find("</think>")
+    if think_end != -1:
+        text = text[think_end + len("</think>"):]
+
+    # Keep only the part from the first { to the last }
+    # (this also removes ```json fences and any text around the JSON)
+    start = text.find("{")
+    end = text.rfind("}")
+    if start == -1 or end == -1 or end < start:
+        raise ValueError("No JSON object found in model response: " + repr(raw_text[:200]))
+
+    json_text = text[start:end + 1]
+
+    try:
+        # strict=False allows raw newlines inside string values (common in multi-line SQL)
+        parsed = json.loads(json_text, strict=False)
+    except json.JSONDecodeError:
+        # Fallback: the model may have returned a Python-style dict with single quotes
+        try:
+            parsed = ast.literal_eval(json_text)
+        except (ValueError, SyntaxError):
+            raise ValueError("Could not parse model response: " + repr(raw_text[:200]))
+
+    if not isinstance(parsed, dict) or "query" not in parsed:
+        raise ValueError("Model response has no 'query' field: " + repr(raw_text[:200]))
+
+    if "reasoning" not in parsed:
+        parsed["reasoning"] = ""
+
+    return parsed
+
+
 def get_sqlquery(query,schema):
     llm1 = HuggingFaceEndpoint(
         repo_id="XGenerationLab/XiYanSQL-QwenCoder-32B-2504",
         task="text-generation",
         huggingfacehub_api_token=HUGGINGFACE_API_KEY,
-        temperature=0.1   # low temp — you want deterministic SQL, not creative variation
+        temperature=0.1,       # low temp — you want deterministic SQL, not creative variation
+        max_new_tokens=2048,   # default is 512, which can cut long answers off
     )
 
     llm2 = HuggingFaceEndpoint(
-        repo_id="Qwen2.5-Coder-32B-Instruct",
+        repo_id="Qwen/Qwen2.5-Coder-32B-Instruct",   # was missing the "Qwen/" org prefix
         task="text-generation",
         huggingfacehub_api_token=HUGGINGFACE_API_KEY,
-        temperature=0.1
+        temperature=0.1,
+        max_new_tokens=2048,
     )
 
     model1 = ChatHuggingFace(llm=llm1)
@@ -106,8 +148,8 @@ def get_sqlquery(query,schema):
         print("SQL Generation Successful ✅")
         return sql_query
     except Exception as e:
-        print("Model 2 inference failed")
-        result1=None
+        print(f"Model 2 inference failed {e}")
+        return None
 
 
 def get_results(sql_query):
@@ -135,7 +177,8 @@ def TTSQL_pipeline(user_query):
 
     try:
         sql_query = get_sqlquery(user_query, schema)
-        sql_query_dict = json.loads(sql_query)
+        print("SQL GEN RAW RESPONSE:", repr(sql_query))
+        sql_query_dict = parse_sql_response(sql_query)
         print("Generated SQL Query:", sql_query_dict['query'])
         print("Reasoning:", sql_query_dict['reasoning'])
     except Exception as e:
@@ -147,6 +190,18 @@ def TTSQL_pipeline(user_query):
             "reasoning": None,
             "results": None,
             "error": f"SQL generation failed: {e}",
+        }
+
+    # The prompt tells the model to return "-- CANNOT_ANSWER" when the schema can't answer the question
+    if sql_query_dict['query'].strip().startswith("-- CANNOT_ANSWER"):
+        print("Model could not answer:", sql_query_dict['reasoning'])
+        return {
+            "user_query": user_query,
+            "database_schema": schema,
+            "generated_sql_query": sql_query_dict['query'],
+            "reasoning": sql_query_dict['reasoning'],
+            "results": None,
+            "error": "This question cannot be answered with the available schema: " + str(sql_query_dict['reasoning']),
         }
 
     try:

@@ -20,7 +20,7 @@
     </div>
     <div class="nav-actions">
       <a href="studio.html" class="btn btn-primary">Try Live Demo</a>
-      <a href="https://github.com" class="btn-icon" aria-label="GitHub">
+      <a href="https://github.com/anmollate" class="btn-icon" aria-label="GitHub">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
       </a>
     </div>
@@ -43,12 +43,12 @@
         <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
         <div>
           <h3>System flow</h3>
-          <div class="card-sub">Generation is checked by a judge model before anything reaches the user</div>
+          <div class="card-sub">A judge model reviews every query — if it's not satisfactory, you decide whether to regenerate</div>
         </div>
       </div>
 
       <div class="flow-diagram-wrap">
-        <svg class="flow-svg" viewBox="0 0 720 690" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System flow: user prompt goes to the schema extraction module, then the query generation module, then evaluation, then an LLM judge which either shows results or sends the query back for regeneration.">
+        <svg class="flow-svg" viewBox="0 0 760 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="System flow: user prompt goes to the schema extraction module, then the query generation module, then evaluation, then an LLM judge. If satisfactory, results are shown to the user. If not, the verdict and reasoning are shown to the user instead, who can manually trigger regeneration.">
           <defs>
             <marker id="arrMain" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
               <path d="M0,0 L10,5 L0,10 z" fill="var(--text-faint)"/>
@@ -68,14 +68,16 @@
           <line x1="360" y1="356" x2="360" y2="388" class="fd-line" marker-end="url(#arrMain)"/>
           <line x1="360" y1="454" x2="360" y2="486" class="fd-line" marker-end="url(#arrMain)"/>
           <line x1="360" y1="578" x2="360" y2="608" class="fd-line fd-yes" marker-end="url(#arrYes)"/>
-          <path d="M470,533 C 592,533 592,226 472,226" class="fd-line fd-no" marker-end="url(#arrNo)" fill="none"/>
+          <line x1="470" y1="533" x2="536" y2="533" class="fd-line fd-no" marker-end="url(#arrNo)"/>
+          <path d="M628,554 C 702,554 702,226 472,226" class="fd-line fd-no" marker-end="url(#arrNo)" fill="none"/>
 
           <!-- edge labels -->
           <text x="374" y="180" class="fd-edge-label">schema + user query</text>
           <text x="374" y="278" class="fd-edge-label">generated SQL</text>
           <text x="374" y="376" class="fd-edge-label">answer + query + SQL + schema</text>
           <text x="378" y="598" class="fd-edge-label fd-yes-label">Yes</text>
-          <text x="596" y="380" class="fd-edge-label fd-no-label" text-anchor="middle" transform="rotate(-90 596 380)">not satisfactory — regenerate</text>
+          <text x="503" y="524" class="fd-edge-label fd-no-label" text-anchor="middle">No</text>
+          <text x="606" y="380" class="fd-edge-label fd-no-label" text-anchor="middle" transform="rotate(-90 606 380)">user clicks Regenerate</text>
 
           <!-- nodes -->
           <g class="fd-node">
@@ -116,6 +118,12 @@
             <rect x="250" y="608" width="220" height="46" rx="9"/>
             <text x="360" y="636" class="fd-title" text-anchor="middle">Results shown to user</text>
           </g>
+
+          <g class="fd-node fd-node-warn">
+            <rect x="536" y="508" width="184" height="50" rx="9"/>
+            <text x="628" y="530" class="fd-title" text-anchor="middle">Verdict shown to user</text>
+            <text x="628" y="548" class="fd-sub" text-anchor="middle">judge's reasoning included</text>
+          </g>
         </svg>
       </div>
     </div>
@@ -126,24 +134,30 @@
         <div class="ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
         <div>
           <h3>Models in the pipeline</h3>
-          <div class="card-sub">Two models, two distinct jobs</div>
+          <div class="card-sub">Three models, two distinct jobs</div>
         </div>
       </div>
       <div class="usage-list">
         <div class="usage-item">
-          <span class="u-name">XiYanSQL-QwenCoder<br/>-7B-2504</span>
-          <div class="usage-bar-track"><div class="usage-bar-fill" style="width:22%"></div></div>
-          <span class="u-pct">7B</span>
+          <span class="u-name">XiYanSQL-QwenCoder<br/>-32B-2504</span>
+          <div class="usage-bar-track"><div class="usage-bar-fill" style="width:100%"></div></div>
+          <span class="u-pct">32B</span>
         </div>
         <div class="usage-item">
-          <span class="u-name">Qwen3-32B</span>
+          <span class="u-name">Qwen2.5-Coder-32B-Instruct<br/>-32B-2504</span>
+          <div class="usage-bar-track"><div class="usage-bar-fill" style="width:100%"></div></div>
+          <span class="u-pct">32B</span>
+        </div>
+        <div class="usage-item">
+          <span class="u-name">Qwen/Qwen3-32B</span>
           <div class="usage-bar-track"><div class="usage-bar-fill" style="width:100%"></div></div>
           <span class="u-pct">32B</span>
         </div>
       </div>
       <div class="usage-caption">
-        <span><b>XiYanSQL-QwenCoder-7B-2504</b> — generates SQL from the schema and question.</span>
-        <span><b>Qwen3-32B</b> — judges the generated SQL and result before it reaches the user.</span>
+        <span><b>XiYanSQL-QwenCoder-32B-2504</b> — generates SQL from the schema and question.</span>
+        <span><b>Qwen2.5-Coder-32B-Instruct</b> — generates SQL from the schema and question in case the primary llm fails.</span>
+        <span><b>Qwen3-32B</b> — judges the generated SQL and result before it reaches the user, and surfaces its reasoning if the query is flagged.</span>
       </div>
     </div>
 
@@ -167,7 +181,7 @@
         </div>
         <div class="strategy-step">
           <span class="s-dot"></span>
-          <div><b>Judge-validated output</b><span>The generated SQL, its result, the question, and the schema all go to a second model that checks the answer before it's shown.</span></div>
+          <div><b>Judge-validated output</b><span>The generated SQL, its result, the question, and the schema all go to a second model that checks the answer before it's shown. If flagged, the verdict and reasoning are shown to you, and you decide whether to regenerate.</span></div>
         </div>
       </div>
     </div>
@@ -186,12 +200,9 @@
           <div class="m-top"><span class="m-name">Execution accuracy</span><span class="m-val">91%</span></div>
           <div class="metric-bar-track"><div class="metric-bar-fill" data-value="91"></div></div>
         </div>
+
         <div class="metric-block">
-          <div class="m-top"><span class="m-name">Exact-match accuracy</span><span class="m-val">78%</span></div>
-          <div class="metric-bar-track"><div class="metric-bar-fill" data-value="78"></div></div>
-        </div>
-        <div class="metric-block">
-          <div class="m-top"><span class="m-name">Avg. latency (p50)</span><span class="m-val">1.4s</span></div>
+          <div class="m-top"><span class="m-name">Avg. latency</span><span class="m-val">20s</span></div>
           <div class="metric-bar-track"><div class="metric-bar-fill" data-value="65"></div></div>
         </div>
         <div class="metric-block">
@@ -234,7 +245,7 @@
           <div class="t-role">Sole contributor — data, model integration, and this interface</div>
           <div class="t-bio">Fourth-year AI &amp; Data Science engineering student. Built QueryMind end to end: schema linking, prompt design, and the Studio interface shown here.</div>
         </div>
-        <a href="https://github.com" class="team-link">
+        <a href="https://github.com/anmollate" class="team-link">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.5 7.5 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8 8 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
           GitHub
         </a>
@@ -250,7 +261,7 @@
     <div class="footer-links">
       <a href="index.html">Home</a>
       <a href="studio.html">Product</a>
-      <a href="https://github.com">GitHub</a>
+      <a href="https://github.com/anmollate">GitHub</a>
     </div>
   </div>
 </footer>

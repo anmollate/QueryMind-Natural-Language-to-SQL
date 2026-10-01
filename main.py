@@ -1,6 +1,6 @@
 from TextToSQLEngine import TTSQL_pipeline
 from llm_as_a_Judge import get_llm_judgement #needs work on judgement pipeline
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles  
 from schema_extraction_module import extract_schema
@@ -15,20 +15,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class user_query(BaseModel):
+class UserQuery(BaseModel):
     query: str
 
 query_results={} #temporary storage for query results
 
 
 @app.post("/generate_sql_query")
-def generate_sql_query(query:user_query):
+def generate_sql_query(query:UserQuery):
     global query_results
     user_query=query.query
     data=TTSQL_pipeline(user_query)
     query_results=data
     return {
-        "generated_sql_query": data['generated_sql_query']
+        "generated_sql_query": data['generated_sql_query'],
+        "error": data.get('error')
     }
 
 #endpoint to get the reasoning for generated sql query
@@ -48,7 +49,18 @@ def get_results():
 #endpoint to get the judgement of the judge llm on the generated query
 @app.get("/get_judgement")
 def get_judgement():
-    judgement=get_llm_judgement(query_results["user_query"],query_results["database_schema"],query_results["generated_sql_query"],query_results["results"])
+    if not query_results:
+        raise HTTPException(status_code=400, detail="Generate a SQL query first.")
+
+    if query_results.get("error"):
+        raise HTTPException(status_code=400, detail="Cannot judge: " + str(query_results["error"]))
+
+    try:
+        judgement=get_llm_judgement(query_results["user_query"],query_results["database_schema"],query_results["generated_sql_query"],query_results["results"])
+    except Exception as error:
+        raise HTTPException(status_code=502, detail="Judge LLM failed: "+str(error))
+
+    print(judgement)
     return {
         "sql_validity_score":judgement["sql_validity"]["score"],
         "sql_validity_reason":judgement["sql_validity"]["reason"],
