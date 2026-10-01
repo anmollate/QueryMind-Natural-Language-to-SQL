@@ -206,7 +206,3 @@ Example questions you could ask:
 - **Evaluation**: add a benchmark set of questions with expected SQL to measure accuracy over time.
 
 ---
-
-## License
-
-Add a license of your choice (for example MIT) before publishing.
