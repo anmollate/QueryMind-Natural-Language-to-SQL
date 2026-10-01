@@ -19,7 +19,7 @@ Ask questions about a PostgreSQL database in plain English. The app turns your q
 
 ## How It Works
 
-![System architecture](docs/images/architecture.png)
+![System architecture](architecture.png)
 
 *System architecture: the user's prompt goes through schema extraction, SQL generation, execution and the LLM judge. If the verdict is unsatisfactory, the judge's reasoning is shown and the user can regenerate.*
 
